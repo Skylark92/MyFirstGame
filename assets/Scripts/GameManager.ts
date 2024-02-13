@@ -33,6 +33,8 @@ export class GameManager extends Component {
 
     this._road = [];
 
+    this._road.push(BlockType.BT_STONE);
+
     for (let i = 1; i < this.roadLength; i++) {
       if (this._road[i - 1] === BlockType.BT_NONE) {
         this._road.push(BlockType.BT_STONE);
