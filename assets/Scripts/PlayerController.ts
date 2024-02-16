@@ -33,9 +33,7 @@ export class PlayerController extends Component {
   @property(Animation)
   BodyAnim: Animation = null;
 
-  start() {
-    input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this);
-  }
+  start() {}
 
   update(deltaTime: number) {
     // 화면 업데이트
@@ -102,6 +100,14 @@ export class PlayerController extends Component {
       } else if (step === 2) {
         this.BodyAnim.play("twoStep");
       }
+    }
+  }
+
+  setInputActive(active: boolean) {
+    if (active) {
+      input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this);
+    } else {
+      input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this);
     }
   }
 }

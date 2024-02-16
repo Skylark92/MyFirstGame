@@ -3,11 +3,19 @@ import {
   CCInteger,
   Component,
   instantiate,
+  Label,
   Node,
   Prefab,
+  Vec3,
 } from "cc";
-import { BLOCK_SIZE } from "./PlayerController";
+import { BLOCK_SIZE, PlayerController } from "./PlayerController";
 const { ccclass, property } = _decorator;
+
+enum GameState {
+  GS_INIT,
+  GS_PLAYING,
+  GS_END,
+}
 
 enum BlockType {
   BT_NONE,
@@ -22,8 +30,40 @@ export class GameManager extends Component {
   public roadLength: number = 50;
   private _road: BlockType[] = [];
 
+  // References to the startMenu node.
+  @property({ type: Node })
+  public startMenu: Node | null = null;
+
+  //references to player
+  @property({ type: PlayerController })
+  public playerCtrl: PlayerController | null = null;
+
+  //references to UICanvas/Steps node.
+  @property({ type: Label })
+  public stepsLabel: Label | null = null;
+
   start() {
+    this.setCurState(GameState.GS_INIT);
     this.generateRoad();
+  }
+
+  init() {
+    //show the start menu
+    if (this.startMenu) {
+      this.startMenu.active = true;
+    }
+
+    //generate the map
+    this.generateRoad();
+
+    if (this.playerCtrl) {
+      //disable input
+      this.playerCtrl.setInputActive(false);
+
+      //reset player data.
+      this.playerCtrl.node.setPosition(Vec3.ZERO);
+      // this.playerCtrl.reset();
+    }
   }
 
   update(deltaTime: number) {}
@@ -69,5 +109,35 @@ export class GameManager extends Component {
     }
 
     return block;
+  }
+
+  setCurState(value: GameState) {
+    switch (value) {
+      case GameState.GS_INIT:
+        this.init();
+        break;
+      case GameState.GS_PLAYING:
+        if (this.startMenu) {
+          this.startMenu.active = false;
+        }
+        //reset steps counter to 0
+        if (this.stepsLabel) {
+          this.stepsLabel.string = "0";
+        }
+
+        //enable user input after 0.1 second.
+        setTimeout(() => {
+          if (this.playerCtrl) {
+            this.playerCtrl.setInputActive(true);
+          }
+        }, 0.1);
+        break;
+      case GameState.GS_END:
+        break;
+    }
+  }
+
+  onStartButtonClicked() {
+    this.setCurState(GameState.GS_PLAYING);
   }
 }
