@@ -13,6 +13,8 @@ export const BLOCK_SIZE = 40;
 
 @ccclass("PlayerController")
 export class PlayerController extends Component {
+  // 이동한 횟수 저장
+  private _curMoveIndex: number = 0;
   // Player가 점프하는 지 여부 판단에 사용
   private _startJump: boolean = false;
   // 점프할 횟수 (1, 2)
@@ -46,6 +48,8 @@ export class PlayerController extends Component {
         this.node.setPosition(this._targetPos);
         // 점프 상태 초기화
         this._startJump = false;
+
+        this.onOnceJumpEnd();
       } else {
         // 움직임이 남았을 경우
         // 현재 위치 복제
@@ -101,6 +105,8 @@ export class PlayerController extends Component {
         this.BodyAnim.play("twoStep");
       }
     }
+
+    this._curMoveIndex += step;
   }
 
   setInputActive(active: boolean) {
@@ -109,6 +115,14 @@ export class PlayerController extends Component {
     } else {
       input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this);
     }
+  }
+
+  reset() {
+    this._curMoveIndex = 0;
+  }
+
+  onOnceJumpEnd() {
+    this.node.emit("JumpEnd", this._curMoveIndex);
   }
 }
 

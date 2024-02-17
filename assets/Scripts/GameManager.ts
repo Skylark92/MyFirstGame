@@ -44,7 +44,7 @@ export class GameManager extends Component {
 
   start() {
     this.setCurState(GameState.GS_INIT);
-    this.generateRoad();
+    this.playerCtrl?.node.on("JumpEnd", this.onPlayerJumpEnd, this);
   }
 
   init() {
@@ -62,7 +62,7 @@ export class GameManager extends Component {
 
       //reset player data.
       this.playerCtrl.node.setPosition(Vec3.ZERO);
-      // this.playerCtrl.reset();
+      this.playerCtrl.reset();
     }
   }
 
@@ -139,5 +139,26 @@ export class GameManager extends Component {
 
   onStartButtonClicked() {
     this.setCurState(GameState.GS_PLAYING);
+  }
+
+  onPlayerJumpEnd(moveIndex: number) {
+    //update steps label.
+    if (this.stepsLabel) {
+      this.stepsLabel.string =
+        "" + (moveIndex >= this.roadLength ? this.roadLength : moveIndex);
+    }
+    this.checkResult(moveIndex);
+  }
+
+  checkResult(moveIndex: number) {
+    if (moveIndex < this.roadLength) {
+      if (this._road[moveIndex] == BlockType.BT_NONE) {
+        //steps on empty block, reset to init.
+        this.setCurState(GameState.GS_INIT);
+      }
+    } else {
+      //out of map, reset to init.
+      this.setCurState(GameState.GS_INIT);
+    }
   }
 }
