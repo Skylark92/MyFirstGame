@@ -76,6 +76,7 @@ export class PlayerController extends Component {
     // Player가 점프 중이면 실행 안 함
     if (this._startJump) return;
 
+    this.node.emit("JumpStart", step);
     // 애니메이션 시간에 따라 점프 시간 설정
     const clipName = step === 1 ? "oneStep" : "twoStep";
     const state = this.BodyAnim.getState(clipName);

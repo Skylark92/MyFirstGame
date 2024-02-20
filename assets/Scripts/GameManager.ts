@@ -45,6 +45,7 @@ export class GameManager extends Component {
   start() {
     this.setCurState(GameState.GS_INIT);
     this.playerCtrl?.node.on("JumpEnd", this.onPlayerJumpEnd, this);
+    this.playerCtrl?.node.on("JumpStart", this.addRoad, this);
   }
 
   init() {
@@ -83,7 +84,27 @@ export class GameManager extends Component {
       }
     }
 
-    console.log("road: ", this._road);
+    for (let j = 0; j < this._road.length; j++) {
+      let block: Node | null = this.spawnBlockByType(this._road[j]);
+
+      if (block) {
+        this.node.addChild(block);
+        block.setPosition(j * BLOCK_SIZE, 0, 0);
+      }
+    }
+  }
+
+  addRoad(step: number) {
+    for (let i = 0; i < step; i++) {
+      if (this._road[this.roadLength - 1] === BlockType.BT_NONE) {
+        this._road.push(BlockType.BT_STONE);
+      } else {
+        this._road.push(Math.floor(Math.random() * 2));
+      }
+
+      this.roadLength++;
+      console.log("created!");
+    }
 
     for (let j = 0; j < this._road.length; j++) {
       let block: Node | null = this.spawnBlockByType(this._road[j]);
@@ -147,6 +168,7 @@ export class GameManager extends Component {
       this.stepsLabel.string =
         "" + (moveIndex >= this.roadLength ? this.roadLength : moveIndex);
     }
+
     this.checkResult(moveIndex);
   }
 
